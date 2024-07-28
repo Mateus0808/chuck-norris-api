@@ -1,18 +1,18 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { ChuckNorris } from './chuck-norris.model';
+import { ChuckNorrisEntity } from '../models/chuck-norris/entities/chuck-norris.entity';
 import { ChuckNorrisService } from './chuck-norris.service';
 
-@Resolver(() => ChuckNorris)
+@Resolver(() => ChuckNorrisEntity)
 export class ChuckNorrisFactResolver {
   constructor(private chuckNorrisService: ChuckNorrisService) {}
 
-  @Query(() => ChuckNorris)
-  async getRandomFact() {
-    return this.chuckNorrisService.getRandomFact();
+  @Query(() => ChuckNorrisEntity)
+  async getRandomFact(@Args('category') category: string) {
+    return this.chuckNorrisService.getRandomFact(category);
   }
 
-  @Query(() => ChuckNorris)
-  async getRandomFactByCategory(@Args('category') category: string) {
-    return this.chuckNorrisService.getRandomFactByCategory(category);
+  @Query(() => ChuckNorrisEntity)
+  async getRandomJokeByText(@Args('query') query: string) {
+    return this.chuckNorrisService.getRandomJokeByText(query);
   }
 }

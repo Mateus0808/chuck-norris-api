@@ -1,59 +1,45 @@
-import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { ChuckNorris } from './chuck-norris.model';
-import { firstValueFrom } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { ChuckNorrisEntity } from './../models/chuck-norris/entities/chuck-norris.entity';
+import { IChuckNorrisRepository } from './../models/chuck-norris/interfaces/chuck-norris-data.interface';
+import { BadRequestException } from './../common/exceptions/bad-request.exception';
+import { Inject, Injectable } from '@nestjs/common';
+import { IChuckNorrisTransformationService } from './interfaces/chuck-norris-transformation.interface';
 
 @Injectable()
 export class ChuckNorrisService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    @Inject('IChuckNorrisRepository')
+    private readonly dataService: IChuckNorrisRepository,
 
-  async getRandomFactByCategory(category: string): Promise<ChuckNorris> {
-    const url = `https://api.chucknorris.io/jokes/random?category=${category}`;
-    return new Promise<ChuckNorris>((resolve, reject) => {
-      this.httpService
-        .get(url)
-        .pipe(
-          map((response) => ({
-            id: response.data.id,
-            value: response.data.value,
-            icon_url: response.data.icon_url,
-            url: response.data.url,
-          })),
-        )
-        .subscribe({
-          next: (data) => {
-            console.log('Alo', data);
-            resolve(data);
-          },
-          error: (error) => {
-            console.error('Error:', error);
-            reject(error);
-          },
-        });
-    });
+    @Inject('IChuckNorrisTransformationService')
+    private readonly transformationService: IChuckNorrisTransformationService,
+  ) {}
+
+  async getRandomJokeByText(query: string): Promise<ChuckNorrisEntity> {
+    const data = await this.dataService.getJokes(query);
+    const jokes = data.result;
+    if (jokes.length === 0)
+      throw new BadRequestException('Piada não encontrada');
+
+    const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+
+    return this.transformationService.mapToChuckNorris(randomJoke);
+  }
+
+  async getRandomFact(category?: string): Promise<ChuckNorrisEntity> {
+    const data = await this.dataService.getRandomFact(category);
+
+    if (!data)
+      throw new BadRequestException(
+        `Não foi possível encontrar o fato aleatório: ${category}`,
+      );
+
+    return this.transformationService.mapToChuckNorris(data);
   }
 
   async getCategories(): Promise<string[]> {
-    const url = 'https://api.chucknorris.io/jokes/categories';
-    const response = await this.httpService.get(url).toPromise();
-    return response.data;
-  }
+    const data = this.dataService.getCategories();
+    if (!data) throw new BadRequestException(`Categorias não encontrada`);
 
-  async getRandomFact(): Promise<ChuckNorris> {
-    const url = 'https://api.chucknorris.io/jokes/random';
-    const data = await firstValueFrom(
-      this.httpService.get(url).pipe(
-        map((response) => {
-          return {
-            id: response.data.id,
-            value: response.data.value,
-            icon_url: response.data.icon_url,
-            url: response.data.url,
-          };
-        }),
-      ),
-    );
     return data;
   }
 }
