@@ -24,7 +24,8 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Esta documentação descreve os endpoints disponíveis na API Chuck Norris Facts, implementada usando o framework NestJS. A API fornece informações sobre piadas de Chuck Norris, incluindo categorias e piadas aleatórias baseadas em texto livre ou categorias específicas.
+
 
 ## Installation
 
@@ -58,15 +59,63 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
+## Endpoints
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### 1. Obter Categorias
+GET /chuck-norris-fact/categories
+Retorna uma lista de todas as categorias de piadas disponíveis.
+* Exemplo de Requisição:
+```bash
+GET /chuck-norris-fact/categories
+```
+* Exemplo de Resposta:
+```json
+{
+  "categories": ["animal", "career", "celebrity", "dev", "explicit", "fashion", "food", "history", "money", "movie", "music", "political", "religion", "science", "sport", "travel"]
+}
+```
+### 2. Obter Piada Aleatória por Texto Livre
+GET /chuck-norris-fact/free-text
+Retorna uma piada aleatória baseada em uma pesquisa de texto livre.
 
-## Stay in touch
+Parâmetros de Query: query (string) - O texto para a pesquisa.
+* Exemplo de Requisição:
+```bash
+GET /chuck-norris-fact/free-text?query=funny
+```
+* Exemplo de Resposta:
+```json
+{
+  "data": {
+    "id": "RANDOM_JOKE_ID",
+    "value": "A funny Chuck Norris joke.",
+    "icon_url": "https://assets.chucknorris.host/img/avatar/chuck-norris.png",
+    "url": "https://api.chucknorris.io/jokes/RANDOM_JOKE_ID"
+  }
+}
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### 3. Obter Piada Aleatória por Categoria
+GET /chuck-norris-fact/random
+Retorna uma piada aleatória de uma categoria específica.
+
+Parâmetros de Query: category (string) - A categoria para a piada aleatória. (Opcional)
+* Exemplo de Requisição:
+```GET /chuck-norris-fact/random?category=animal```
+* Exemplo de Resposta:
+```json
+{
+  "data": {
+    "id": "RANDOM_JOKE_ID",
+    "value": "A Chuck Norris joke about animals.",
+    "icon_url": "https://assets.chucknorris.host/img/avatar/chuck-norris.png",
+    "url": "https://api.chucknorris.io/jokes/RANDOM_JOKE_ID"
+  }
+}
+```
+
+- Author - [Mateus dos Santos](https://www.linkedin.com/in/mateus-dos-santos/)
+- Website - [Chuck Norris App](https://chuck-norris-client.vercel.app/)
 
 ## License
 
