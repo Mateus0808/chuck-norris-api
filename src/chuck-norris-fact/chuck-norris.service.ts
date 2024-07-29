@@ -37,8 +37,10 @@ export class ChuckNorrisService {
   }
 
   async getCategories(): Promise<string[]> {
-    const data = this.dataService.getCategories();
-    if (!data) throw new BadRequestException(`Categorias não encontrada`);
+    const data = await this.dataService.getCategories();
+    if (!data) {
+      throw new BadRequestException(`Categorias não encontradas`);
+    }
 
     return data;
   }
